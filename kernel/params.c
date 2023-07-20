@@ -158,7 +158,17 @@ static int parse_one(char *param,
 	return -ENOENT;
 }
 
-/* Args looks like "foo=bar,bar2 baz=fuz wiz". */
+/**
+ * parse_args - parse a string of kernel boot arguments
+ * @doing: what we're doing (for error messages)
+ * @args: the string to parse
+ * @params: array of kernel_param structs to parse
+ * @num: number of kernel_param structs in @params
+ * @min_level: minimum level to parse
+ * @max_level: maximum level to parse
+ * @return: NULL on success, or an error pointer
+ * Args looks like "foo=bar,bar2 baz=fuz wiz". 
+*/
 char *parse_args(const char *doing,
 		 char *args,
 		 const struct kernel_param *params,
