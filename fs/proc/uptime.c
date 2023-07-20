@@ -1,4 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
+/*
+ * fs/proc/uptime.c
+ *
+ * /proc/uptime 
+ * 
+ * This file contains the code for reporting the system uptime.
+ */
 #include <linux/fs.h>
 #include <linux/init.h>
 #include <linux/proc_fs.h>
