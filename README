@@ -1,18 +1,28 @@
-Linux kernel
-============
+# Linux kernel
 
-There are several guides for kernel developers and users. These guides can
-be rendered in a number of formats, like HTML and PDF. Please read
-Documentation/admin-guide/README.rst first.
+This is my modified verison of the linux kernel. It might contain weird changes, comments and code. This repositroy is mainly for me to learn about the linux kernel and for testing purposes.
 
-In order to build the documentation, use ``make htmldocs`` or
-``make pdfdocs``.  The formatted documentation can also be read online at:
+## Building
 
-    https://www.kernel.org/doc/html/latest/
+### Prerequisites
 
-There are various text files in the Documentation/ subdirectory,
-several of them using the Restructured Text markup notation.
+You need a few packages to build the kernel. On Ubuntu you can install them with:
 
-Please read the Documentation/process/changes.rst file, as it contains the
-requirements for building and running the kernel, and information about
-the problems which may result by upgrading your kernel.
+```bash
+sudo apt install build-essential libncurses-dev bison flex libssl-dev libelf-dev
+```
+
+### Building
+
+To build the kernel, run:
+
+```bash
+make
+```
+
+If you want to build the kernel with multiple threads, run:
+
+```bash
+make -j$(nproc)
+```
+
