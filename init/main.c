@@ -1307,17 +1307,37 @@ static int __init ignore_unknown_bootoption(char *param, char *val,
 
 static void __init do_initcall_level(int level, char *command_line)
 {
+	int ret;
 	initcall_entry_t *fn;
+	initcall_entry_t *stop;
 
+	/* Parse the command line and store the results in the initcall_args
+	 * array.  */
 	parse_args(initcall_level_names[level],
 		   command_line, __start___param,
 		   __stop___param - __start___param,
 		   level, level,
 		   NULL, ignore_unknown_bootoption);
 
+	/* Trace the level for the boot sequence.  */
 	trace_initcall_level(initcall_level_names[level]);
-	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)
-		do_one_initcall(initcall_from_entry(fn));
+
+	/* Call each function in the initcall_levels array in turn.  */
+	stop = initcall_levels[level + 1];
+	for (fn = initcall_levels[level]; fn < stop; fn++) {
+		ret = do_one_initcall(initcall_from_entry(fn));
+		if (ret != 0) {
+			if(ret == -ENOENT){
+				pr_debug("initcall: %pS returned with an error: no such file or directory. Code:2\n", initcall_from_entry(fn));
+
+			} else if (ret == -ENODEV) {
+				pr_debug("initcall: %pS returned with an error: no such device. Code:19\n", initcall_from_entry(fn));
+			} else {	
+				pr_debug("initcall: %pS returned with an error code: %d\n", initcall_from_entry(fn), ret);
+			}
+			
+		}
+	}
 }
 
 static void __init do_initcalls(void)
@@ -1326,12 +1346,14 @@ static void __init do_initcalls(void)
 	size_t len = saved_command_line_len + 1;
 	char *command_line;
 
+	/* Allocate memory to hold the command line. */
 	command_line = kzalloc(len, GFP_KERNEL);
 	if (!command_line)
 		panic("%s: Failed to allocate %zu bytes\n", __func__, len);
 
+	/* For each initcall level, execute all of the initcalls in that level. */
 	for (level = 0; level < ARRAY_SIZE(initcall_levels) - 1; level++) {
-		/* Parser modifies command_line, restore it each time */
+		/* Parser modifies command_line, restore it each time. */
 		strcpy(command_line, saved_command_line);
 		do_initcall_level(level, command_line);
 	}
