@@ -174,3 +174,17 @@ sphinx_*/
 
 # Rust analyzer configuration
 /rust-project.json
+
+# Extra files created by build process
+*.cmd
+*.d
+*.S
+.version
+.checked-atomic-arch-fallback.h
+.checked-atomic-instrumented.h
+.checked-atomic-long.h
+.tmp_vmlinux.kallsyms1
+.tmp_vmlinux.kallsyms1.syms
+.tmp_vmlinux.kallsyms2
+.tmp_vmlinux.kallsyms2.syms
+.vmlinux.export.c
