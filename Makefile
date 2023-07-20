@@ -2139,6 +2139,11 @@ kernelversion:
 image_name:
 	@echo $(KBUILD_IMAGE)
 
+test:
+	@echo $(TEST)
+	sh test.sh
+
+
 quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files)))
       cmd_rmfiles = rm -rf $(rm-files)
 
