@@ -198,6 +198,13 @@ static const char *panic_later, *panic_param;
 
 extern const struct obs_kernel_param __setup_start[], __setup_end[];
 
+/**
+ * obsolete_checksetup - check for obsolete boot options
+ * 
+ * @line: boot option string
+ * @returns: true if @line contained an obsolete boot option
+ * Check for obsolete boot options and print a warning if one is found.
+*/
 static bool __init obsolete_checksetup(char *line)
 {
 	const struct obs_kernel_param *p;
@@ -541,7 +548,9 @@ static int __init unknown_bootoption(char *param, char *val,
 
 	repair_env_string(param, val);
 
-	/* Handle obsolete-style parameters */
+	/* We need to handle obsolete options here since we don't
+	 * want to pass them to init.
+	 */
 	if (obsolete_checksetup(param))
 		return 0;
 
