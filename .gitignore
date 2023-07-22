@@ -188,3 +188,5 @@ sphinx_*/
 .tmp_vmlinux.kallsyms2
 .tmp_vmlinux.kallsyms2.syms
 .vmlinux.export.c
+.config
+.config.old
