@@ -113,6 +113,21 @@ static bool param_check_unsafe(const struct kernel_param *kp)
 	return true;
 }
 
+/**
+ * parse_one - parse a single kernel boot argument
+ * 
+ * @param: the parameter name
+ * @val: the parameter value
+ * @doing: what we're doing (for error messages)
+ * @params: array of kernel_param structs to parse
+ * @num_params: number of kernel_param structs in @params
+ * @min_level: minimum level to parse
+ * @max_level: maximum level to parse
+ * @arg: argument to pass to @handle_unknown
+ * @handle_unknown: function to call for unknown parameters
+ * @return: 0 on success, or an error code
+ * 
+*/
 static int parse_one(char *param,
 		     char *val,
 		     const char *doing,
