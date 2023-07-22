@@ -2141,7 +2141,7 @@ image_name:
 
 test:
 	@echo $(TEST)
-	sh test.sh
+	bash test.sh
 
 
 quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files)))
