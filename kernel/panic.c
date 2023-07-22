@@ -41,6 +41,9 @@
 #define PANIC_TIMER_STEP 100
 #define PANIC_BLINK_SPD 18
 
+/* Makes panic messages nicer to read */
+#define FANCY_PANIC_MESSAGE 1
+
 #ifdef CONFIG_SMP
 /*
  * Should we dump all CPUs backtraces in an oops event?
@@ -330,8 +333,10 @@ void panic(const char *fmt, ...)
 
 	if (len && buf[len - 1] == '\n')
 		buf[len - 1] = '\0';
-
-	pr_emerg("Kernel panic - not syncing: %s\n", buf);
+	if (FANCY_PANIC_MESSAGE)
+		pr_emerg("========[ Kernel panic - not syncing: %s ]========\n", buf);
+	else
+		pr_emerg("Kernel panic - not syncing: %s\n", buf);
 #ifdef CONFIG_DEBUG_BUGVERBOSE
 	/*
 	 * Avoid nested stack-dumping if a panic occurs during oops processing
@@ -438,7 +443,10 @@ void panic(const char *fmt, ...)
 #if defined(CONFIG_S390)
 	disabled_wait();
 #endif
-	pr_emerg("---[ end Kernel panic - not syncing: %s ]---\n", buf);
+	if (FANCY_PANIC_MESSAGE)
+		pr_emerg("========[ end Kernel panic - not syncing: %s ]========\n", buf);
+	else
+		pr_emerg("---[ end Kernel panic - not syncing: %s ]---\n", buf);
 
 	/* Do not scroll important messages printed above */
 	suppress_printk = 1;
