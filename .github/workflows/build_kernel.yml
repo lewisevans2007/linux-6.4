@@ -1,0 +1,22 @@
+name: Build Linux Kernel
+
+on:
+  push
+
+jobs:
+  build_kernel:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install required packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install fakeroot build-essential ncurses-dev xz-utils libssl-dev bc flex libelf-dev bison
+    
+    - name: Build Kernel
+      run: |
+        make defconfig
+        make -j $(nproc)
