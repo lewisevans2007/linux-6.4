@@ -14,14 +14,9 @@ jobs:
     - name: Install required packages
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential libncurses-dev bison flex libssl-dev libelf-dev
-
-    - name: Set up QEMU
-      run: sudo apt-get install -y qemu qemu-user-static binfmt-support
-
+        sudo apt-get install -y build-essential libncurses-dev bison flex libssl-dev libelf-
+    
     - name: Build Kernel
       run: |
-        git clone https://github.com/torvalds/linux.git
-        cd linux
         make defconfig
         make -j $(nproc)
