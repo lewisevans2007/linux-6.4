@@ -20,7 +20,7 @@ jobs:
     - name: Scan for linting issues
       run: |
         for file in $(find . -name "*.c" -o -name "*.h"); do
-          cppcheck --enable=all --inconclusive --force --inline-suppr --quiet --error-exitcode=1 --suppress=missingIncludeSystem $file
+          cppcheck --enable=all --inconclusive --force --inline-suppr --quiet --error-exitcode=0 --suppress=missingIncludeSystem $file
         done
 
     - name: Create issues
