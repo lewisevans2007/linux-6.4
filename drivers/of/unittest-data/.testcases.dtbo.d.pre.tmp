@@ -1,0 +1,9 @@
+testcases.o: drivers/of/unittest-data/testcases.dtso \
+ drivers/of/unittest-data/testcases_common.dtsi \
+ drivers/of/unittest-data/tests-phandle.dtsi \
+ drivers/of/unittest-data/tests-interrupts.dtsi \
+ drivers/of/unittest-data/tests-match.dtsi \
+ drivers/of/unittest-data/tests-address.dtsi \
+ drivers/of/unittest-data/tests-platform.dtsi \
+ drivers/of/unittest-data/tests-overlay.dtsi \
+ drivers/of/unittest-data/tests-lifecycle.dtsi
