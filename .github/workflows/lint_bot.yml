@@ -34,8 +34,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.LINT_BOT_TOKEN }}
         with:
           title: "[Lint Bot] ${{ github.event.inputs.file_name }} ${{ github.event.inputs.issue_name }}"
-          body: |
-            File Path: ${{ github.event.inputs.file_path }}
-            Issue: ${{ github.event.inputs.issue_name }}
-            Line: ${{ github.event.inputs.line_number }}
+          filename: .github/lint_bot_issue.md
           labels: Bot
