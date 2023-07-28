@@ -28,12 +28,14 @@ jobs:
           cppcheck --enable=all --inconclusive --force --inline-suppr --quiet --error-exitcode=0 --suppress=missingIncludeSystem $file
         done
 
-    - name: Create issues
-      uses: peter-evans/create-issue-from-file@v2
-      with:
-        title: "[Lint Bot] ${{ github.event.inputs.file_name }} ${{ github.event.inputs.issue_name }}"
-        body: |
-          File Path: ${{ github.event.inputs.file_path }}
-          Issue: ${{ github.event.inputs.issue_name }}
-          Line: ${{ github.event.inputs.line_number }}
-        labels: Bot
+      - name: Create issues
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.LINT_BOT_TOKEN }}
+        with:
+          title: "[Lint Bot] ${{ github.event.inputs.file_name }} ${{ github.event.inputs.issue_name }}"
+          body: |
+            File Path: ${{ github.event.inputs.file_path }}
+            Issue: ${{ github.event.inputs.issue_name }}
+            Line: ${{ github.event.inputs.line_number }}
+          labels: Bot
