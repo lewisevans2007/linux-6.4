@@ -32,4 +32,3 @@ jobs:
           Issue: ${{ github.event.inputs.issue_name }}
           Line: ${{ github.event.inputs.line_number }}
         labels: Bot
-```
