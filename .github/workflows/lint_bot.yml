@@ -35,4 +35,4 @@ jobs:
         with:
           title: "[Lint Bot] ${{ github.event.inputs.file_name }} ${{ github.event.inputs.issue_name }}"
           filename: .github/lint_bot_issue.md
-          labels: Bot
+          labels: bot
