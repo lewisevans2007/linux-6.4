@@ -13,5 +13,5 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: C/C++ Linter
-    uses: cpp-linter/cpp-linter-action@v2.4.2
+      uses: cpp-linter/cpp-linter-action@v2.4.2
     - step-summary: true
