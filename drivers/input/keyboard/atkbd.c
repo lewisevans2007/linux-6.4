@@ -26,7 +26,6 @@
 #include <linux/mutex.h>
 #include <linux/dmi.h>
 #include <linux/property.h>
-#include <linux/printk.h>
 
 #define DRIVER_DESC	"AT and PS/2 keyboard driver"
 
