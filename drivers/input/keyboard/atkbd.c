@@ -26,6 +26,7 @@
 #include <linux/mutex.h>
 #include <linux/dmi.h>
 #include <linux/property.h>
+#include <linux/printk.h>
 
 #define DRIVER_DESC	"AT and PS/2 keyboard driver"
 
@@ -1215,14 +1216,18 @@ static int atkbd_connect(struct serio *serio, struct serio_driver *drv)
 	struct atkbd *atkbd;
 	struct input_dev *dev;
 	int err = -ENOMEM;
-
+	int ret;
 	atkbd = kzalloc(sizeof(struct atkbd), GFP_KERNEL);
 	dev = input_allocate_device();
 	if (!atkbd || !dev)
 		goto fail1;
 
 	atkbd->dev = dev;
-	ps2_init(&atkbd->ps2dev, serio);
+	ret = ps2_init(&atkbd->ps2dev, serio);
+	if (ret) {
+		dev_err(&serio->dev, "Failed to initialize PS/2 protocol.\n");
+		goto fail1;
+	}
 	INIT_DELAYED_WORK(&atkbd->event_work, atkbd_event_work);
 	mutex_init(&atkbd->mutex);
 
