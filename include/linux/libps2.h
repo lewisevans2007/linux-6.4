@@ -45,7 +45,7 @@ struct ps2dev {
 	u8 nak;
 };
 
-void ps2_init(struct ps2dev *ps2dev, struct serio *serio);
+int ps2_init(struct ps2dev *ps2dev, struct serio *serio);
 int ps2_sendbyte(struct ps2dev *ps2dev, u8 byte, unsigned int timeout);
 void ps2_drain(struct ps2dev *ps2dev, size_t maxbytes, unsigned int timeout);
 void ps2_begin_command(struct ps2dev *ps2dev);

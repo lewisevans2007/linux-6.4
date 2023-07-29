@@ -376,15 +376,24 @@ EXPORT_SYMBOL(ps2_sliced_command);
  * ps2_init() initializes ps2dev structure
  */
 
-void ps2_init(struct ps2dev *ps2dev, struct serio *serio)
+int ps2_init(struct ps2dev *ps2dev, struct serio *serio)
 {
-	mutex_init(&ps2dev->cmd_mutex);
-	lockdep_set_subclass(&ps2dev->cmd_mutex, serio->depth);
-	init_waitqueue_head(&ps2dev->wait);
-	ps2dev->serio = serio;
+    int ret = 0;
+    if (!ps2dev || !serio) {
+        ret = -EINVAL;
+        goto out;
+    }
+
+    mutex_init(&ps2dev->cmd_mutex);
+    lockdep_set_subclass(&ps2dev->cmd_mutex, serio->depth);
+    init_waitqueue_head(&ps2dev->wait);
+    ps2dev->serio = serio;
+	goto out;
+
+out:
+    return ret;
 }
 EXPORT_SYMBOL(ps2_init);
-
 /*
  * ps2_handle_ack() is supposed to be used in interrupt handler
  * to properly process ACK/NAK of a command from a PS/2 device.
