@@ -1225,7 +1225,7 @@ static int atkbd_connect(struct serio *serio, struct serio_driver *drv)
 	atkbd->dev = dev;
 	ret = ps2_init(&atkbd->ps2dev, serio);
 	if (ret) {
-		dev_err(&serio->dev, "Failed to initialize PS/2 protocol.\n");
+		dev_err(&serio->dev, "Failed to initialize PS/2.\n");
 		goto fail1;
 	}
 	INIT_DELAYED_WORK(&atkbd->event_work, atkbd_event_work);
