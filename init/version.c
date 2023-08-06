@@ -17,18 +17,34 @@
 #include <linux/utsname.h>
 #include <linux/proc_ns.h>
 
+/**
+ * early_hostname - set hostname early parameter
+ * @arg: hostname string
+ * @return: 0 on success, -EINVAL if the hostname is too long
+*/
 static int __init early_hostname(char *arg)
 {
 	size_t bufsize = sizeof(init_uts_ns.name.nodename);
-	size_t maxlen  = bufsize - 1;
+	/* bufsize is the size of the buffer that will hold the hostname */
+
+	size_t maxlen = bufsize - 1;
+	/* Max len is the maximum size of the buffer 
+	 * that can be held in the kernel. This is ussually
+	 * 64 bytes. */
+
 	size_t arglen;
 
 	arglen = strlcpy(init_uts_ns.name.nodename, arg, bufsize);
+	/* Using strlcpy we can copy the string and return the length
+	 * of the string. If the length of the string is greater than
+	 * the buffer size, then the string is truncated */
+
 	if (arglen > maxlen) {
 		pr_warn("hostname parameter exceeds %zd characters and will be truncated",
 			maxlen);
+		return -EINVAL; /* Return a error since the string is too long */
 	}
-	return 0;
+	return 1; /* Return 1 on success */
 }
 early_param("hostname", early_hostname);
 
