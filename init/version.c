@@ -17,7 +17,6 @@
 #include <linux/utsname.h>
 #include <linux/proc_ns.h>
 
-
 /**
  * early_hostname - set hostname early parameter
  * @arg: hostname string
@@ -27,8 +26,8 @@ static int __init early_hostname(char *arg)
 {
 	size_t bufsize = sizeof(init_uts_ns.name.nodename);
 	/* bufsize is the size of the buffer that will hold the hostname */
-	
-	size_t maxlen  = bufsize - 1;
+
+	size_t maxlen = bufsize - 1;
 	/* Max len is the maximum size of the buffer 
 	 * that can be held in the kernel. This is ussually
 	 * 64 bytes. */
