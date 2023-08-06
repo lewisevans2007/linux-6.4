@@ -4,7 +4,7 @@
 
 
 qemu-system-x86_64 -kernel arch/x86/boot/bzImage -initrd ~/initramfs.cpio.gz \
-  --append "root=/dev/ram init=/init console=ttyS0" -nographic \
+  --append "root=/dev/ram init=/init console=ttyS0 hostname=This is a test" -nographic \
   -device usb-ehci,id=ehci \
   -device usb-kbd \
   -device virtio-rng-pci \
