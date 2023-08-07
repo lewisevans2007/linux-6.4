@@ -1,4 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
+/*
+ * /init/initramfs.c - initramfs unpacking and setup
+ *
+ * This file is responsible for unpacking the initramfs image into the
+ * rootfs, and freeing the memory used by the initramfs image.
+ * 
+*/
 #include <linux/init.h>
 #include <linux/async.h>
 #include <linux/fs.h>
@@ -22,6 +29,15 @@
 static __initdata bool csum_present;
 static __initdata u32 io_csum;
 
+/**
+ * xwrite - write to a file using kernel_write
+ * @file: file to write to
+ * @p: buffer to write from
+ * @count: number of bytes to write
+ * @pos: position to write to
+ * 
+ * @returns: The number of bytes written, or an error code
+*/
 static ssize_t __init xwrite(struct file *file, const unsigned char *p,
 		size_t count, loff_t *pos)
 {
@@ -53,7 +69,7 @@ static ssize_t __init xwrite(struct file *file, const unsigned char *p,
 	return out;
 }
 
-static __initdata char *message;
+static __initdata char *message; 
 static void __init error(char *x)
 {
 	if (!message)
@@ -74,6 +90,21 @@ static __initdata struct hash {
 	char name[N_ALIGN(PATH_MAX)];
 } *head[32];
 
+
+/**
+ * hash - Calculate a hash value for a device file.
+ *
+ * This function calculates a hash value for a device file based on its major
+ * and minor numbers and its inode number. The hash value is used to index into
+ * a hash table that is used to look up device files by their major and minor
+ * numbers.
+ *
+ * @param major The major number of the device file.
+ * @param minor The minor number of the device file.
+ * @param ino   The inode number of the device file.
+ *
+ * @return The hash value for the device file.
+ */
 static inline int hash(int major, int minor, int ino)
 {
 	unsigned long tmp = ino + minor + (major << 3);
@@ -81,34 +112,61 @@ static inline int hash(int major, int minor, int ino)
 	return tmp & 31;
 }
 
+/**
+ * find_link - Find a link to a device file in the initramfs hash table.
+ *
+ * This function searches the initramfs hash table for a link to a device file
+ * with the specified major and minor numbers, inode number, mode, and name.
+ * If a link to the device file is found, the function returns a pointer to
+ * the name of the link. If a link to the device file is not found, the
+ * function adds a new entry to the hash table and returns NULL.
+ *
+ * @param major The major number of the device file.
+ * @param minor The minor number of the device file.
+ * @param ino   The inode number of the device file.
+ * @param mode  The mode of the device file.
+ * @param name  The name of the link to the device file.
+ *
+ * @return A pointer to the name of the link to the device file, or NULL if a
+ *         link to the device file was not found and a new entry was added to
+ *         the hash table.
+ */
 static char __init *find_link(int major, int minor, int ino,
-			      umode_t mode, char *name)
+                  umode_t mode, char *name)
 {
-	struct hash **p, *q;
-	for (p = head + hash(major, minor, ino); *p; p = &(*p)->next) {
-		if ((*p)->ino != ino)
-			continue;
-		if ((*p)->minor != minor)
-			continue;
-		if ((*p)->major != major)
-			continue;
-		if (((*p)->mode ^ mode) & S_IFMT)
-			continue;
-		return (*p)->name;
-	}
-	q = kmalloc(sizeof(struct hash), GFP_KERNEL);
-	if (!q)
-		panic_show_mem("can't allocate link hash entry");
-	q->major = major;
-	q->minor = minor;
-	q->ino = ino;
-	q->mode = mode;
-	strcpy(q->name, name);
-	q->next = NULL;
-	*p = q;
-	return NULL;
+    struct hash **p, *q;
+
+    /* Search the hash table for a link to the device file */
+    for (p = head + hash(major, minor, ino); *p; p = &(*p)->next) {
+        if ((*p)->ino != ino)
+            continue;
+        if ((*p)->minor != minor)
+            continue;
+        if ((*p)->major != major)
+            continue;
+        if (((*p)->mode ^ mode) & S_IFMT)
+            continue;
+        return (*p)->name;
+    }
+
+    /* Add a new entry to the hash table */
+    q = kmalloc(sizeof(struct hash), GFP_KERNEL);
+    if (!q)
+        panic_show_mem("can't allocate link hash entry");
+    q->major = major;
+    q->minor = minor;
+    q->ino = ino;
+    q->mode = mode;
+    strcpy(q->name, name);
+    q->next = NULL;
+    *p = q;
+
+    return NULL;
 }
 
+/**
+ * free_hash - Free the initramfs hash table.
+*/
 static void __init free_hash(void)
 {
 	struct hash **p, *q;
@@ -183,6 +241,18 @@ static __initdata gid_t gid;
 static __initdata unsigned rdev;
 static __initdata u32 hdr_csum;
 
+/**
+ * parse_header - Parse the header of an initramfs file.
+ *
+ * This function parses the header of an initramfs file and extracts the
+ * metadata for the file, including its inode number, mode, owner, group,
+ * number of hard links, modification time, body length, major and minor
+ * numbers, device number, name length, and header checksum.
+ *
+ * @param s A pointer to the start of the header string.
+ *
+ * @return None.
+ */
 static void __init parse_header(char *s)
 {
 	unsigned long parsed[13];
@@ -272,6 +342,22 @@ static int __init do_collect(void)
 	return 0;
 }
 
+/**
+ * @brief Parse a CPIO header and advance to the next header.
+ *
+ * This function parses a CPIO header and advances to the next header in the
+ * CPIO archive. The function checks the magic number in the header to determine
+ * if the archive uses checksums, and sets the `csum_present` flag accordingly.
+ * If the magic number is not recognized, the function returns an error.
+ *
+ * If the header represents a symbolic link, the function sets up to collect the
+ * link target and returns. If the header represents a regular file or an empty
+ * file, the function reads the file name and sets up to read the file data. If
+ * the header represents any other type of file, the function skips over the
+ * file data and advances to the next header.
+ *
+ * @return 0 on success, 1 on error.
+ */
 static int __init do_header(void)
 {
 	if (!memcmp(collected, "070701", 6)) {
@@ -480,6 +566,20 @@ static unsigned long my_inptr __initdata; /* index of next byte to be processed 
 
 #include <linux/decompress/generic.h>
 
+/**
+ * unpack_to_rootfs - Unpack the initramfs archive into the root file system.
+ *
+ * This function unpacks the initramfs archive into the root file system. The
+ * archive is assumed to be compressed using one of the supported compression
+ * methods. The function reads the archive data from a buffer and writes the
+ * unpacked files to the root file system.
+ *
+ * @param buf A pointer to the buffer containing the compressed archive data.
+ * @param len The length of the compressed archive data in bytes.
+ *
+ * @return A pointer to a message string if an error occurred, or NULL if the
+ *         archive was unpacked successfully.
+ */
 static char * __init unpack_to_rootfs(char *buf, unsigned long len)
 {
 	long written;
