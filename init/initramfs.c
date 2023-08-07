@@ -25,6 +25,7 @@
 #include <linux/init_syscalls.h>
 #include <linux/task_work.h>
 #include <linux/umh.h>
+#include <linux/printk.h>
 
 static __initdata bool csum_present;
 static __initdata u32 io_csum;
@@ -167,7 +168,7 @@ static char __init *find_link(int major, int minor, int ino,
 /**
  * free_hash - Free the initramfs hash table.
 */
-static void __init free_hash(void)
+static int __init free_hash(void)
 {
 	struct hash **p, *q;
 	for (p = head; p < head + 32; p++) {
@@ -177,6 +178,11 @@ static void __init free_hash(void)
 			kfree(q);
 		}
 	}
+	if (head[0] || head[1] || head[2] || head[3]) {
+		pr_warn("initramfs: Failed to free all data in the hash table\n");
+		return -1;
+	}
+	return 0;
 }
 
 #ifdef CONFIG_INITRAMFS_PRESERVE_MTIME
