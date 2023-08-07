@@ -1979,3 +1979,10 @@ config ARCH_HAS_SYNC_CORE_BEFORE_USERMODE
 # <asm/syscall_wrapper.h>.
 config ARCH_HAS_SYSCALL_WRAPPER
 	def_bool n
+
+config PRINTK_CLEAR_DEBUG
+	bool "Enable printk clear debug messages"
+	help
+	  Enable printk clear debug messages. Turn this off if you don't 
+	  want to see these messages in the log.
+	default n
