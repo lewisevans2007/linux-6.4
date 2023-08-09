@@ -806,6 +806,14 @@ static void synchronize_group_exit(struct task_struct *tsk, long code)
 	spin_unlock_irq(&sighand->siglock);
 }
 
+/**
+ * do_exit - Sets the PF_EXITING flag for the 
+ * current task and calls
+ * 
+ * @code: The exit code to use
+ * 
+ * @returns: Void
+*/
 void __noreturn do_exit(long code)
 {
 	struct task_struct *tsk = current;
