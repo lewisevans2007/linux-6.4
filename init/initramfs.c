@@ -26,6 +26,7 @@
 #include <linux/task_work.h>
 #include <linux/umh.h>
 #include <linux/printk.h>
+#include <linux/printk_clear_debug.h>
 
 static __initdata bool csum_present;
 static __initdata u32 io_csum;
@@ -540,8 +541,12 @@ static long __init write_buffer(char *buf, unsigned long len)
 	byte_count = len;
 	victim = buf;
 
-	while (!actions[state]())
-		;
+	do {
+		if (actions[state]()) {
+			break;
+		}
+	} while (1);
+
 	return len - byte_count;
 }
 
