@@ -26,7 +26,6 @@
 #include <linux/task_work.h>
 #include <linux/umh.h>
 #include <linux/printk.h>
-#include <linux/printk_clear_debug.h>
 
 static __initdata bool csum_present;
 static __initdata u32 io_csum;
