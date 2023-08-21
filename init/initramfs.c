@@ -540,8 +540,12 @@ static long __init write_buffer(char *buf, unsigned long len)
 	byte_count = len;
 	victim = buf;
 
-	while (!actions[state]())
-		;
+	do {
+		if (actions[state]()) {
+			break;
+		}
+	} while (1);
+
 	return len - byte_count;
 }
 
