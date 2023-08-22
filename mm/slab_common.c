@@ -25,6 +25,7 @@
 #include <asm/page.h>
 #include <linux/memcontrol.h>
 #include <linux/stackdepot.h>
+#include <linux/printk.h>
 
 #include "internal.h"
 #include "slab.h"
@@ -991,7 +992,8 @@ EXPORT_SYMBOL(__kmalloc_node_track_caller);
  * kfree - free previously allocated memory
  * @object: pointer returned by kmalloc() or kmem_cache_alloc()
  *
- * If @object is NULL, no operation is performed.
+ * If @object is NULL, no operation is performed and the 
+ * function just returns.
  */
 void kfree(const void *object)
 {
@@ -1001,8 +1003,10 @@ void kfree(const void *object)
 
 	trace_kfree(_RET_IP_, object);
 
-	if (unlikely(ZERO_OR_NULL_PTR(object)))
+	if (unlikely(ZERO_OR_NULL_PTR(object))){
+		/* Object was NULL or ZERO_SIZE_PTR */
 		return;
+	}
 
 	folio = virt_to_folio(object);
 	if (unlikely(!folio_test_slab(folio))) {
